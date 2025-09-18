@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Format Harga</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .demo {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e8f5e8;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Format Harga Otomatis</h1>
+    
+    <div class="form-group">
+        <label for="productPrice">Harga Produk:</label>
+        <input type="text" id="productPrice" placeholder="Masukkan harga...">
+    </div>
+    
+    <div class="demo">
+        <h3>Instruksi Test:</h3>
+        <ol>
+            <li>Klik pada input harga di atas</li>
+            <li>Ketik angka (contoh: 15000)</li>
+            <li>Lihat format otomatis menjadi "Rp 15.000"</li>
+            <li>Coba ketik angka lain untuk melihat pemisah ribuan</li>
+        </ol>
+        
+        <div class="result" id="result">
+            Nilai bersih (tanpa format): <span id="cleanValue">-</span>
+        </div>
+    </div>
+
+    <script>
+        class PriceFormatter {
+            constructor() {
+                this.bindPriceFormatting();
+            }
+            
+            bindPriceFormatting() {
+                const priceInput = document.getElementById('productPrice');
+                if (priceInput) {
+                    // Format on input
+                    priceInput.addEventListener('input', (e) => {
+                        this.formatPriceInput(e.target);
+                        this.updateCleanValue(e.target);
+                    });
+                    
+                    // Format on focus
+                    priceInput.addEventListener('focus', (e) => {
+                        if (!e.target.value.startsWith('Rp ')) {
+                            this.formatPriceInput(e.target);
+                        }
+                    });
+                    
+                    // Clean format on blur for processing
+                    priceInput.addEventListener('blur', (e) => {
+                        this.cleanPriceFormat(e.target);
+                        this.updateCleanValue(e.target);
+                    });
+                }
+            }
+            
+            formatPriceInput(input) {
+                // Get cursor position before formatting
+                const cursorPosition = input.selectionStart;
+                const oldLength = input.value.length;
+                
+                let value = input.value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+                
+                if (value) {
+                    // Add thousand separators
+                    const formattedValue = parseInt(value).toLocaleString('id-ID');
+                    input.value = 'Rp ' + formattedValue;
+                    
+                    // Restore cursor position accounting for added characters
+                    const newLength = input.value.length;
+                    const lengthDiff = newLength - oldLength;
+                    const newCursorPosition = Math.max(3, cursorPosition + lengthDiff); // Minimum position after 'Rp '
+                    input.setSelectionRange(newCursorPosition, newCursorPosition);
+                } else {
+                    input.value = 'Rp ';
+                    input.setSelectionRange(3, 3); // Position cursor after 'Rp '
+                }
+            }
+            
+            cleanPriceFormat(input) {
+                let value = input.value.replace(/[^0-9]/g, ''); // Keep only numbers
+                if (value) {
+                    // Format back with Rp and thousand separators
+                    value = parseInt(value).toLocaleString('id-ID');
+                    input.value = 'Rp ' + value;
+                } else {
+                    input.value = '';
+                }
+            }
+            
+            updateCleanValue(input) {
+                const cleanValue = input.value.replace(/[^0-9]/g, '');
+                document.getElementById('cleanValue').textContent = cleanValue || '-';
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            new PriceFormatter();
+        });
+    </script>
+</body>
+</html>
