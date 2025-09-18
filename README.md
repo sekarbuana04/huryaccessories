@@ -111,4 +111,4 @@ Untuk mengubah warna tema, edit variabel CSS di file `assets/css/style.css`:
 
 ## Lisensi
 
-Hak Cipta © 2023 Hury Asesoris. Semua hak dilindungi.
+Hak Cipta © 2025 Hury Asesoris. Semua hak dilindungi.
